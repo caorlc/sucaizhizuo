@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Page Image Assets"
+  short_description: "Generate replacement image assets from feature page copy."
+  default_prompt: "Generate replacement image assets for this feature page URL based on its confirmed copy, using the page slug for filenames."
