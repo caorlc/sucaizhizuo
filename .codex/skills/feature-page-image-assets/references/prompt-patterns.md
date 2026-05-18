@@ -20,13 +20,23 @@
 
 除非页面文案或用户要求指向其他风格，默认从下面两类风格中选择。
 
-### 高级深色 AI 展示风
+## 同批布局差异规则
+
+当一次生成 6 张功能页配图时，先为整批图片分配不同的布局 archetype。统一高级感可以保留，但展示方式要错开：
+
+- 不要让多张图同时使用相同的“居中大圆角结果卡 + 右后方小副卡 + 浅色影棚产品图”组合。
+- 让相邻图片至少改变 3 个维度：主体类型、主体比例、卡片层级、辅助元素、背景/光线、镜头距离、构图方向。
+- 可混用这些布局：单张沉浸式结果图、前后对比切片、细节放大、轻量参考卡、少量变体堆叠、场景化成片、抽象编辑轨迹、格式适配卡。
+- 语义优先，不为追求差异强行套固定品类模板；每张仍要表达对应文案的核心利益点。
+- 生成后用 contact sheet 抽检整体重复度；如果看起来像同一套模板的换皮，重写重复项 prompt。
+
+### 语义优先的 AI 展示风
 
 适用于 AI 模型页、图像生成器、text-to-image 工具、多模态工具和高级创作模型页。
 
 视觉语言：
 
-- 深蓝、墨绿、炭黑、低饱和紫色或深青色渐变背景。
+- 背景不固定深色或浅色；根据页面语义选择高级中性影棚、柔和渐变舞台、明亮产品展示或低饱和深色氛围。
 - 大尺寸圆角图片卡，带细描边、柔和阴影和克制发光。
 - 舞台感构图，以一张大结果图作为焦点。
 - 可选一个圆形细节放大、一个前后对比切片，或一张次级卡片来解释能力。
@@ -35,7 +45,7 @@
 可加入英文 prompt 的短句：
 
 ```text
-Premium dark-gradient AI showcase, one oversized hero image card as the focal point, subtle rounded border, soft shadow, restrained glow accents, generous negative space, maximum two supporting visual elements, no busy collage.
+Premium AI image-generation showcase, one oversized hero image card as the focal point, background tone chosen to match the feature semantics, subtle rounded border, soft shadow, restrained light accents, generous negative space, maximum two supporting visual elements, no busy collage.
 ```
 
 ### 明亮干净的图像增强展示风
