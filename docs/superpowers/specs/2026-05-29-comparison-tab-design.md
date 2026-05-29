@@ -2,7 +2,7 @@
 
 - 日期：2026-05-29
 - 目标落地页：aigazou.net `/features/ai-action-figure-generator`
-- 状态：待用户 review
+- 状态：**已废弃** —— 由 [`2026-05-29-image-edit-skill-design.md`](./2026-05-29-image-edit-skill-design.md) 取代（方案从「网页 Tab」改为「skill 驱动」）。仅作历史记录保留。
 
 ## 1. 背景与目标
 
