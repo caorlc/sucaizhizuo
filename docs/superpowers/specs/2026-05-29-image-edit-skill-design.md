@@ -71,12 +71,15 @@
 
 | 范围 | 数量 | 尺寸 | 模式 | 默认编号 |
 |---|---:|---|---|---|
-| `hero 原图 input` | 1 | 800×800 | single（真实照片，可不走 AI 仅裁切） | `-1` |
-| `showcase` | 4 | 800×1200 竖 | result（AI 结果，主体不雷同） | `-2…-5` |
-| `features` | 3 | 1200×800 横 | **compare**（before/after 合成） | `-6…-8` |
-| `use cases` | 3 | 800×1200 竖 | result（场景化） | `-9…-11` |
-| `全套落地页` | 11 | 上面全部 | 混合 | `-1…-11` |
-| `单张/一次性编辑` | 自定义 | 自定义 | single/compare | 用户给名 |
+| `cover 原图 input` | 1 | 800×800 | single `--no-ai`（原图裁切） | `-1` |
+| `cover 处理后 output` | 1 | 800×800 | single（AI 处理后；与 input 同一主体） | `-2` |
+| `showcase` | 4 | 800×1200 竖 | result（AI 结果，主体不雷同） | `-3…-6` |
+| `features` | 3 | 1200×800 横 | **compare**（左完整原图 / 右完整处理后） | `-7…-9` |
+| `use cases` | 3 | 800×1200 竖 | result（场景化） | `-10…-12` |
+| `全套落地页` | 12 | 上面全部 | 混合 | `-1…-12` |
+| `单张/一次性编辑` | 自定义 | 自定义 | single/result/compare | 用户给名 |
+
+> cover 两张同一主体：先出 output 记下其 `sourceUrl`，再用 `--no-ai --source <sourceUrl>` 出 input。所有产物 `.webp`。
 
 数量/尺寸/编号均可当场覆盖。编号规则与现有 skill 对齐，便于替换占位图。
 
