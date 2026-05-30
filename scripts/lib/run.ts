@@ -36,8 +36,8 @@ export async function runEdit(opts: EditOptions, deps: RunDeps): Promise<RunResu
   const model = deps.getModel(opts.model);
   const provider = deps.getProvider(model.provider);
 
-  // compare 生成走横图 16:9（与原图同框，便于左右切分对齐），最终合成 1200×800；其余按 opts.size
-  const genSize: BizSize = opts.mode === "compare" ? "1200x800" : opts.size;
+  // compare 生成走竖图 9:16（主体填满 600×800 半幅更好看），最终左右拼成 1200×800；其余按 opts.size
+  const genSize: BizSize = opts.mode === "compare" ? "800x1200" : opts.size;
   const finalWH = SIZE_WH[opts.mode === "compare" ? "1200x800" : opts.size];
 
   const count = opts.mode === "single" ? 1 : opts.count;

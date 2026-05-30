@@ -37,7 +37,7 @@ export async function downloadAndProcess(
   await processImage(buffer, outputPath, size);
 }
 
-// before/after 对比合成：1200×800「同一张图左右切分」——左半原图、右半结果，
+// before/after 对比合成：1200×800，左半=完整原图、右半=完整处理后图（真正的「原图 vs 处理后」对比），
 // 中间一道白色虚线分隔，左右各一枚圆角 Before/After 药丸标签，外角做圆角（透明）。
 export async function composeComparison(originalBuf: Buffer, resultBuf: Buffer): Promise<Buffer> {
   const W = 1200;
@@ -45,11 +45,9 @@ export async function composeComparison(originalBuf: Buffer, resultBuf: Buffer):
   const HALF = W / 2; // 600
   const RADIUS = 28;
 
-  // 两张都铺满 1200×800（cover），再各取一半拼成「同一张图的左右对比」
-  const leftFull = await sharp(originalBuf).resize(W, H, { fit: "cover", position: "centre" }).toBuffer();
-  const rightFull = await sharp(resultBuf).resize(W, H, { fit: "cover", position: "centre" }).toBuffer();
-  const leftHalf = await sharp(leftFull).extract({ left: 0, top: 0, width: HALF, height: H }).toBuffer();
-  const rightHalf = await sharp(rightFull).extract({ left: HALF, top: 0, width: HALF, height: H }).toBuffer();
+  // 左右两半各自把「完整图」cover 进 600×800（主体居中）：左=原图本身、右=处理后的同一张原图
+  const leftHalf = await sharp(originalBuf).resize(HALF, H, { fit: "cover", position: "centre" }).toBuffer();
+  const rightHalf = await sharp(resultBuf).resize(HALF, H, { fit: "cover", position: "centre" }).toBuffer();
 
   // 叠加层：中间虚线 + Before/After 圆角药丸标签
   const overlay = Buffer.from(

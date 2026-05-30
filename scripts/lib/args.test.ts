@@ -16,10 +16,10 @@ describe("parseArgs", () => {
     });
   });
 
-  it("defaults compare size to 1200x800 and orientation to landscape", () => {
+  it("defaults compare size to 1200x800 and orientation to portrait", () => {
     const o = parseArgs(["--prompt", "p", "--source", "dog", "--slug", "afg", "--mode", "compare"]);
     expect(o.size).toBe("1200x800");
-    expect(o.orientation).toBe("landscape");
+    expect(o.orientation).toBe("portrait");
   });
 
   it("requires slug and source", () => {

@@ -21,7 +21,7 @@ const SIZES: BizSize[] = ["800x800", "800x1200", "1200x800"];
 const MODES: Mode[] = ["single", "result", "compare"];
 
 function defaultOrientation(mode: Mode, size: BizSize): Orientation {
-  if (mode === "compare") return "landscape";
+  if (mode === "compare") return "portrait";
   if (size === "800x800") return "squarish";
   if (size === "1200x800") return "landscape";
   return "portrait";
