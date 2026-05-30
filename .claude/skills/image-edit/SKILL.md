@@ -93,4 +93,4 @@ sips -g pixelWidth -g pixelHeight output/image-edit/<slug>/<slug>-2.webp
 
 ## 前置条件
 
-项目根存在 `.env.local`，含 `KIE_API_KEY` 与 `UNSPLASH_ACCESS_KEY`（见 README）。缺失时 CLI 会给出中文报错。
+项目根存在 `.env.local` 或 `.env`（loadEnv 两者都读，`.env.local` 优先），含 `KIE_API_KEY` 与 `UNSPLASH_ACCESS_KEY`（见 README）。缺失时 CLI 会给出中文报错。

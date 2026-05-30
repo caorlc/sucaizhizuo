@@ -37,32 +37,49 @@ export async function downloadAndProcess(
   await processImage(buffer, outputPath, size);
 }
 
-// before/after 对比合成：1200×800 白底，左原图右结果，顶部 Before/After 标签，无箭头
+// before/after 对比合成：1200×800「同一张图左右切分」——左半原图、右半结果，
+// 中间一道白色虚线分隔，左右各一枚圆角 Before/After 药丸标签，外角做圆角（透明）。
 export async function composeComparison(originalBuf: Buffer, resultBuf: Buffer): Promise<Buffer> {
   const W = 1200;
   const H = 800;
-  const PANEL_W = 556;
-  const PANEL_H = 692;
-  const LEFT_X = 32;
-  const RIGHT_X = 612;
-  const PANEL_Y = 76;
+  const HALF = W / 2; // 600
+  const RADIUS = 28;
 
-  const left = await sharp(originalBuf).resize(PANEL_W, PANEL_H, { fit: "cover", position: "centre" }).toBuffer();
-  const right = await sharp(resultBuf).resize(PANEL_W, PANEL_H, { fit: "cover", position: "centre" }).toBuffer();
+  // 两张都铺满 1200×800（cover），再各取一半拼成「同一张图的左右对比」
+  const leftFull = await sharp(originalBuf).resize(W, H, { fit: "cover", position: "centre" }).toBuffer();
+  const rightFull = await sharp(resultBuf).resize(W, H, { fit: "cover", position: "centre" }).toBuffer();
+  const leftHalf = await sharp(leftFull).extract({ left: 0, top: 0, width: HALF, height: H }).toBuffer();
+  const rightHalf = await sharp(rightFull).extract({ left: HALF, top: 0, width: HALF, height: H }).toBuffer();
 
-  const labels = Buffer.from(
+  // 叠加层：中间虚线 + Before/After 圆角药丸标签
+  const overlay = Buffer.from(
     `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-       <text x="${LEFT_X + 4}" y="56" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="600" fill="#475569">Before</text>
-       <text x="${RIGHT_X + 4}" y="56" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="600" fill="#475569">After</text>
+       <line x1="${HALF}" y1="0" x2="${HALF}" y2="${H}" stroke="#ffffff" stroke-width="2" stroke-dasharray="9 9" stroke-opacity="0.85"/>
+       <g font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="600">
+         <rect x="28" y="26" width="132" height="48" rx="13" ry="13" fill="#000000" fill-opacity="0.55"/>
+         <text x="94" y="59" fill="#ffffff" text-anchor="middle">Before</text>
+         <rect x="${HALF + 28}" y="26" width="112" height="48" rx="13" ry="13" fill="#000000" fill-opacity="0.55"/>
+         <text x="${HALF + 84}" y="59" fill="#ffffff" text-anchor="middle">After</text>
+       </g>
      </svg>`
   );
 
-  return sharp({ create: { width: W, height: H, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } } })
+  const flat = await sharp({ create: { width: W, height: H, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } } })
     .composite([
-      { input: left, top: PANEL_Y, left: LEFT_X },
-      { input: right, top: PANEL_Y, left: RIGHT_X },
-      { input: labels, top: 0, left: 0 },
+      { input: leftHalf, left: 0, top: 0 },
+      { input: rightHalf, left: HALF, top: 0 },
+      { input: overlay, left: 0, top: 0 },
     ])
+    .png()
+    .toBuffer();
+
+  // 圆角：用圆角矩形蒙版 dest-in，外角变透明，贴落地页时与背景自然融合
+  const roundMask = Buffer.from(
+    `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" rx="${RADIUS}" ry="${RADIUS}" fill="#ffffff"/></svg>`
+  );
+
+  return sharp(flat)
+    .composite([{ input: roundMask, blend: "dest-in" }])
     .webp({ quality: 90 })
     .toBuffer();
 }
