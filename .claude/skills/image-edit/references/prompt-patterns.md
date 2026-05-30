@@ -46,6 +46,16 @@ High-quality result of the subject transformed into a collectible blister-pack a
 Single strong real-world use-case scene expressing <该 use-case 语义>, one dominant result subject, cinematic but clean lighting, generous whitespace, 800x1200, no platform logos no readable text.
 ```
 
+## 人物源图关键词（帅哥/美女 · 单人优先 · 东亚优先）
+
+主体是人时，给 `--source` 用这些英文关键词（一律带 `portrait`，导向单人正脸高颜值）：
+
+- 美女单人：`beautiful east asian woman portrait` / `pretty korean woman portrait` / `elegant japanese woman portrait` → 兜底 `beautiful woman portrait`
+- 帅哥单人：`handsome east asian man portrait` / `attractive korean man portrait` → 兜底 `handsome man portrait`
+- 双人（次选）：`attractive east asian couple portrait` → 兜底 `beautiful couple portrait`
+
+showcase 4 张要主体不雷同：用不同关键词错开（美女 / 帅哥 / 不同风格各取一两张）。不要群像、人群、背影、模糊或颜值不足的图；命中了就重取。
+
 ## 手办化（action figure）专用提示
 
 - 强调相似度（accurate likeness）、玩具材质（vinyl/resin/plush 视主题）、吸塑盒/底座等收藏品语汇。
