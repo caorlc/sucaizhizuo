@@ -124,7 +124,7 @@ npx tsx scripts/edit.ts --model "google/nano-banana-edit" \
 
 ## 9. before/after 合成 `composeComparison`（加到 `lib/postprocess.ts`）
 
-画布 1200×800 白底，**无箭头**；外边距 32、标签行 ~44、面板间距 24 → 面板 556×692（左 x=32 / 右 x=612, y=76）；原图与结果各 `fit:"cover"` 缩入；SVG overlay 左上「Before」右上「After」（深灰小字）；webp q90。
+画布 1200×800，**左右两半各 600×800**：左半 = 完整原图、右半 = 完整处理后图，各自 `fit:"cover"` 居中填满（真正的「原图 vs 处理后」对比，不是两图各取一半）。中间一道白色虚线分隔（dasharray 9 9），左右各一枚深色半透明圆角「Before / After」药丸标签，外角用圆角矩形蒙版 `dest-in` 做圆角（透明，贴落地页与背景融合）；webp q90、**无箭头**。compare 模式取源+生成走竖图（9:16），主体填半幅更好看。
 
 ## 10. 源图策略
 
