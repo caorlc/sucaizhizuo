@@ -17,7 +17,7 @@ function fakeDeps(overrides: Partial<RunDeps> = {}): RunDeps {
 
 describe("runEdit", () => {
   it("result mode: writes N files named slug-<start..>", async () => {
-    const writeFile = vi.fn(async () => {});
+    const writeFile = vi.fn(async (_file: string, _buf: Buffer) => {});
     const opts = parseArgs(["--prompt", "p", "--source", "puppy", "--slug", "afg", "--mode", "result", "--count", "3", "--start", "2", "--size", "800x1200", "--out", "out"]);
     const res = await runEdit(opts, fakeDeps({ writeFile }));
     expect(res.map((r) => r.index)).toEqual([2, 3, 4]);
