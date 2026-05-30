@@ -88,3 +88,51 @@ export function extractKeywordFromPrompt(prompt: string): string {
     .slice(0, 3);
   return words.length > 0 ? words.join(" ") : "photo";
 }
+
+// 按 id 去重并随机洗牌，最多取 n 张
+export function pickDistinct(photos: UnsplashPhoto[], n: number): UnsplashPhoto[] {
+  const seen = new Set<string>();
+  const distinct: UnsplashPhoto[] = [];
+  for (const p of photos) {
+    if (!seen.has(p.id)) {
+      seen.add(p.id);
+      distinct.push(p);
+    }
+  }
+  for (let i = distinct.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [distinct[i], distinct[j]] = [distinct[j], distinct[i]];
+  }
+  return distinct.slice(0, n);
+}
+
+// 搜索一批图片，去重后返回 count 张归属信息（用于 showcase 主体多样性）
+export async function searchUnsplashPhotos(
+  keyword: string,
+  orientation: UnsplashOrientation,
+  count: number,
+  perPage = 30
+): Promise<UnsplashAttribution[]> {
+  const accessKey = process.env.UNSPLASH_ACCESS_KEY ?? "";
+  if (!accessKey) throw new Error("UNSPLASH_ACCESS_KEY 未配置，请在 .env.local 中设置");
+
+  const url = new URL("https://api.unsplash.com/search/photos");
+  url.searchParams.set("query", keyword);
+  url.searchParams.set("orientation", orientation);
+  url.searchParams.set("per_page", String(perPage));
+
+  const res = await fetch(url.toString(), { headers: { Authorization: `Client-ID ${accessKey}` } });
+  if (res.status === 429) throw new Error("Unsplash API 配额超限（429），请稍后再试");
+  if (!res.ok) throw new Error(`Unsplash 搜索失败：HTTP ${res.status}`);
+
+  const data = (await res.json()) as UnsplashSearchResponse;
+  const distinct = pickDistinct(data.results ?? [], count);
+  if (distinct.length === 0) throw new Error(`Unsplash 没有找到关键词「${keyword}」相关的图片`);
+
+  return distinct.map((photo) => ({
+    photographerName: photo.user.name,
+    photographerUrl: photo.user.links.html,
+    photoUrl: photo.links.html,
+    imageUrl: photo.urls.regular,
+  }));
+}
