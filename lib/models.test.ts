@@ -1,16 +1,16 @@
 import { describe, it, expect } from "vitest";
-import { getModel, MODELS, DEFAULT_MODEL } from "./models";
+import { getModel, MODELS } from "./models";
 
 describe("models registry", () => {
-  it("has nano-banana-edit as the default KIE edit model", () => {
-    const m = getModel(DEFAULT_MODEL);
+  it("has nano-banana-edit as a KIE edit model", () => {
+    const m = getModel("google/nano-banana-edit");
     expect(m.id).toBe("google/nano-banana-edit");
     expect(m.provider).toBe("kie");
     expect(m.kind).toBe("edit");
   });
 
-  it("maps business sizes to KIE image_size params", () => {
-    const m = getModel(DEFAULT_MODEL);
+  it("maps business sizes to nano-banana KIE image_size params", () => {
+    const m = getModel("google/nano-banana-edit");
     expect(m.sizeParam("800x800")).toBe("1:1");
     expect(m.sizeParam("800x1200")).toBe("9:16");
     expect(m.sizeParam("1200x800")).toBe("16:9");

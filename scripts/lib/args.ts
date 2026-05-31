@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL, type BizSize } from "../../lib/models";
+import type { BizSize } from "../../lib/models";
 
 export type Mode = "single" | "result" | "compare";
 export type Orientation = "portrait" | "landscape" | "squarish";
@@ -53,9 +53,10 @@ export function parseArgs(argv: string[]): EditOptions {
   if (!m.prompt && !noAi) throw new Error("缺少 --prompt（或加 --no-ai 仅裁切）");
   if (!m.slug) throw new Error("缺少 --slug");
   if (!m.source) throw new Error("缺少 --source");
+  if (!m.model) throw new Error("缺少 --model（请指定模型，不再使用默认）");
 
   return {
-    model: m.model ?? DEFAULT_MODEL,
+    model: m.model,
     prompt: m.prompt ?? "",
     source: m.source,
     mode,

@@ -18,7 +18,7 @@ function fakeDeps(overrides: Partial<RunDeps> = {}): RunDeps {
 describe("runEdit", () => {
   it("result mode: writes N files named slug-<start..>", async () => {
     const writeFile = vi.fn(async (_file: string, _buf: Buffer) => {});
-    const opts = parseArgs(["--prompt", "p", "--source", "puppy", "--slug", "afg", "--mode", "result", "--count", "3", "--start", "2", "--size", "800x1200", "--out", "out"]);
+    const opts = parseArgs(["--model", "google/nano-banana-edit", "--prompt", "p", "--source", "puppy", "--slug", "afg", "--mode", "result", "--count", "3", "--start", "2", "--size", "800x1200", "--out", "out"]);
     const res = await runEdit(opts, fakeDeps({ writeFile }));
     expect(res.map((r) => r.index)).toEqual([2, 3, 4]);
     expect(res.every((r) => r.ok)).toBe(true);
@@ -29,21 +29,21 @@ describe("runEdit", () => {
 
   it("compare mode: composes instead of plain webp", async () => {
     const compose = vi.fn(async () => Buffer.from("c"));
-    const opts = parseArgs(["--prompt", "p", "--source", "dog", "--slug", "afg", "--mode", "compare", "--count", "1", "--out", "out"]);
+    const opts = parseArgs(["--model", "google/nano-banana-edit", "--prompt", "p", "--source", "dog", "--slug", "afg", "--mode", "compare", "--count", "1", "--out", "out"]);
     await runEdit(opts, fakeDeps({ compose }));
     expect(compose).toHaveBeenCalledOnce();
   });
 
   it("no-ai single: skips provider.generate, crops the source", async () => {
     const generate = vi.fn();
-    const opts = parseArgs(["--source", "dog", "--slug", "afg", "--mode", "single", "--size", "800x800", "--no-ai", "--out", "out"]);
+    const opts = parseArgs(["--model", "google/nano-banana-edit", "--source", "dog", "--slug", "afg", "--mode", "single", "--size", "800x800", "--no-ai", "--out", "out"]);
     const res = await runEdit(opts, fakeDeps({ getProvider: () => ({ generate }) }));
     expect(generate).not.toHaveBeenCalled();
     expect(res).toHaveLength(1);
   });
 
   it("records a failed item instead of throwing when generate rejects", async () => {
-    const opts = parseArgs(["--prompt", "p", "--source", "dog", "--slug", "afg", "--mode", "result", "--count", "1", "--out", "out"]);
+    const opts = parseArgs(["--model", "google/nano-banana-edit", "--prompt", "p", "--source", "dog", "--slug", "afg", "--mode", "result", "--count", "1", "--out", "out"]);
     const res = await runEdit(opts, fakeDeps({ getProvider: () => ({ generate: vi.fn(async () => { throw new Error("boom"); }) }) }));
     expect(res[0].ok).toBe(false);
     expect(res[0].error).toBe("boom");

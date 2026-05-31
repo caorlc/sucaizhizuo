@@ -24,11 +24,9 @@ const SEEDREAM_SIZE: Record<BizSize, string> = {
 };
 
 export const MODELS: ModelDef[] = [
-  { id: "google/nano-banana-edit", label: "Nano Banana Edit（默认）", provider: "kie", kind: "edit", sizeParam: (s) => KIE_SIZE[s] },
+  { id: "google/nano-banana-edit", label: "Nano Banana Edit", provider: "kie", kind: "edit", sizeParam: (s) => KIE_SIZE[s] },
   { id: "bytedance/seedream-v4-edit", label: "Seedream V4 Edit", provider: "kie", kind: "edit", sizeParam: (s) => SEEDREAM_SIZE[s] },
 ];
-
-export const DEFAULT_MODEL = "google/nano-banana-edit";
 
 export function getModel(id: string): ModelDef {
   const m = MODELS.find((x) => x.id === id);
