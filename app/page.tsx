@@ -21,14 +21,7 @@ const KEYWORD_PRESETS: { label: string; value: string }[] = [
 
 const MODELS = [
   { value: "google/nano-banana-edit", label: "google/nano-banana-edit（默认）" },
-  {
-    value: "black-forest-labs/flux-kontext-pro",
-    label: "black-forest-labs/flux-kontext-pro",
-  },
-  {
-    value: "black-forest-labs/flux-kontext-max",
-    label: "black-forest-labs/flux-kontext-max",
-  },
+  { value: "bytedance/seedream-v4-edit", label: "bytedance/seedream-v4-edit" },
 ];
 
 const PLACEHOLDER = `Clean Line Drawing
