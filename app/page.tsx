@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ASPECT_CONFIG, DEFAULT_ASPECT, type Aspect } from "@/lib/aspect";
+import { MODELS as MODEL_DEFS } from "@/lib/models";
 
 const KEYWORD_PRESETS: { label: string; value: string }[] = [
   { label: "人像", value: "portrait" },
@@ -19,10 +20,10 @@ const KEYWORD_PRESETS: { label: string; value: string }[] = [
   { label: "科技", value: "technology" },
 ];
 
-const MODELS = [
-  { value: "google/nano-banana-edit", label: "google/nano-banana-edit（默认）" },
-  { value: "bytedance/seedream-v4-edit", label: "bytedance/seedream-v4-edit" },
-];
+const MODELS = MODEL_DEFS.map((m, i) => ({
+  value: m.id,
+  label: i === 0 ? `${m.id}（默认）` : m.id,
+}));
 
 const PLACEHOLDER = `Clean Line Drawing
 Convert this photo into a minimalist black line drawing.
