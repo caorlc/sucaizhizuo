@@ -36,13 +36,11 @@ function getHeaders(): HeadersInit {
   };
 }
 
-export type KieImageSize = "1:1" | "16:9" | "9:16" | "auto";
-
 export async function createTask(params: {
   model: string;
   prompt: string;
   imageUrl: string;
-  imageSize?: KieImageSize;
+  imageSize?: string;
 }): Promise<string> {
   const res = await fetch(`${KIE_API_BASE}/api/v1/jobs/createTask`, {
     method: "POST",

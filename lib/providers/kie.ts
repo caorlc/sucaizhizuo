@@ -1,4 +1,4 @@
-import { createTask, pollTaskResult, type KieImageSize } from "../kie";
+import { createTask, pollTaskResult } from "../kie";
 import type { GenProvider, GenInput } from "./types";
 
 export const kieProvider: GenProvider = {
@@ -9,7 +9,7 @@ export const kieProvider: GenProvider = {
       model: input.model,
       prompt: input.prompt,
       imageUrl,
-      imageSize: input.size as KieImageSize,
+      imageSize: input.size,
     });
     const resultUrl = await pollTaskResult(taskId);
     return { imageUrl: resultUrl };
