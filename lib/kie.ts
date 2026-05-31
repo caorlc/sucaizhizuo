@@ -1,4 +1,5 @@
 // KIE.AI API 类型定义与调用封装
+import { getModel } from "./models";
 
 export interface KieCreateTaskResponse {
   code: number;
@@ -42,17 +43,18 @@ export async function createTask(params: {
   imageUrl: string;
   imageSize?: string;
 }): Promise<string> {
+  const input = getModel(params.model).buildInput({
+    prompt: params.prompt,
+    imageUrls: [params.imageUrl],
+    size: params.imageSize ?? "auto",
+  });
+
   const res = await fetch(`${KIE_API_BASE}/api/v1/jobs/createTask`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({
       model: params.model,
-      input: {
-        prompt: params.prompt,
-        image_urls: [params.imageUrl],
-        output_format: "png",
-        image_size: params.imageSize ?? "auto",
-      },
+      input,
     }),
   });
 
