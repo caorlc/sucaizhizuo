@@ -8,7 +8,7 @@ vi.hoisted(() => {
 import { createTask } from "./kie";
 
 function mockFetchOk() {
-  const fetchMock = vi.fn(async () => ({
+  const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => ({
     ok: true,
     status: 200,
     json: async () => ({ code: 200, msg: "success", data: { taskId: "t-1" } }),
@@ -30,7 +30,7 @@ describe("createTask request body per model", () => {
       imageSize: "9:16",
     });
     expect(taskId).toBe("t-1");
-    const body = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    const body = JSON.parse(fetchMock.mock.calls[0][1]!.body as string);
     expect(body.model).toBe("google/nano-banana-edit");
     expect(body.input).toEqual({
       prompt: "make a figure",
@@ -48,7 +48,7 @@ describe("createTask request body per model", () => {
       imageUrl: "https://src/b.jpg",
       imageSize: "16:9",
     });
-    const body = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    const body = JSON.parse(fetchMock.mock.calls[0][1]!.body as string);
     expect(body.model).toBe("gpt-image-2-image-to-image");
     expect(body.input).toEqual({
       prompt: "edit it",

@@ -4,7 +4,7 @@ import { parseArgs } from "./args";
 
 function fakeDeps(overrides: Partial<RunDeps> = {}): RunDeps {
   return {
-    getModel: () => ({ id: "m", label: "m", provider: "kie", kind: "edit", sizeParam: () => "9:16" }),
+    getModel: () => ({ id: "m", label: "m", provider: "kie", kind: "edit", sizeParam: () => "9:16", buildInput: () => ({}) }),
     getProvider: () => ({ generate: vi.fn(async () => ({ imageUrl: "https://res/x.png" })) }),
     fetchSources: vi.fn(async (_k, _o, n) => Array.from({ length: n }, (_v, i) => ({ imageUrl: `https://src/${i}.jpg` }))),
     download: vi.fn(async () => Buffer.from("img")),
