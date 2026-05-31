@@ -25,9 +25,11 @@ describe("models registry", () => {
     expect(m.sizeParam("1200x800")).toBe("landscape_16_9");
   });
 
-  it("exposes the flux kontext models too", () => {
-    expect(MODELS.map((m) => m.id)).toContain("black-forest-labs/flux-kontext-pro");
-    expect(MODELS.map((m) => m.id)).toContain("black-forest-labs/flux-kontext-max");
+  it("contains exactly nano-banana-edit and seedream-v4-edit", () => {
+    expect(MODELS.map((m) => m.id)).toEqual([
+      "google/nano-banana-edit",
+      "bytedance/seedream-v4-edit",
+    ]);
   });
 
   it("throws a Chinese error on unknown model", () => {
