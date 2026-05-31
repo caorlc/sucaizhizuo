@@ -5,9 +5,17 @@ import { createTask, pollTaskResult } from "./kie";
 import { searchUnsplashPhoto } from "./unsplash";
 import { downloadAndProcess } from "./postprocess";
 import { getRun, updateCandidate, pickRandomKeyword } from "./storage";
-import { getAspectConfig } from "./aspect";
+import { getAspectConfig, ASPECT_TO_BIZSIZE, DEFAULT_ASPECT, type Aspect } from "./aspect";
+import { getModel } from "./models";
 
 const OUTPUT_DIR = path.join(process.cwd(), "output");
+
+/**
+ * 业务比例 → 该模型的 image_size（经模型注册表，按模型词表解析）
+ */
+export function resolveImageSize(modelId: string, aspect: Aspect | undefined): string {
+  return getModel(modelId).sizeParam(ASPECT_TO_BIZSIZE[aspect ?? DEFAULT_ASPECT]);
+}
 
 /**
  * 生成单条候选
@@ -38,7 +46,7 @@ export async function generateCandidate(
       model: run.model,
       prompt: candidate.prompt,
       imageUrl: source.imageUrl,
-      imageSize: aspectCfg.kieImageSize,
+      imageSize: resolveImageSize(run.model, run.aspect),
     });
 
     // 3. 轮询结果

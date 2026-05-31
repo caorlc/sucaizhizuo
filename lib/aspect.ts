@@ -1,6 +1,8 @@
 // 输出比例配置：横图 / 正方形 / 竖图
 // 整条链路（Unsplash 取图 → KIE 生成 → sharp 后处理 → 前端缩略图）共用同一份配置
 
+import type { BizSize } from "./models";
+
 export type Aspect = "landscape" | "square" | "portrait";
 
 export interface AspectConfig {
@@ -44,6 +46,13 @@ export const ASPECT_CONFIG: Record<Aspect, AspectConfig> = {
 };
 
 export const DEFAULT_ASPECT: Aspect = "square";
+
+// Aspect → skill 业务尺寸（供模型注册表 sizeParam 解析各模型的 image_size 词表）
+export const ASPECT_TO_BIZSIZE: Record<Aspect, BizSize> = {
+  landscape: "1200x800",
+  square: "800x800",
+  portrait: "800x1200",
+};
 
 export function isAspect(v: unknown): v is Aspect {
   return v === "landscape" || v === "square" || v === "portrait";
