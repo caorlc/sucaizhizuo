@@ -1,53 +1,53 @@
-# Seedance 2.0 Video Preset Builder Design
+# Seedance 2.0 视频模板生成器设计
 
-## Context
+## 背景
 
-The current project is a Next.js and TypeScript tool for bulk image prompt generation. It already has KIE API credentials, task polling, local run storage, preview pages, and history pages for image generation. The new feature should extend the product direction toward video effect templates: given a reference video URL, produce a reusable Seedance 2.0 preset that an operator can configure in another backend, and later allow end users to upload one target image to apply that preset.
+当前项目是一个基于 Next.js 和 TypeScript 的批量图片素材生成工具，已经具备 KIE API Key 配置、任务轮询、本地运行记录、预览页和历史页等能力。新功能要把产品方向扩展到视频特效模板：运营人员输入一个参考视频 URL，系统输出一个可复用的 Seedance 2.0 视频模板，方便运营人员复制到其他项目后台进行配置；后续终端用户只需要上传一张目标素材，就能套用这个模板生成对应特效。
 
-The approved first version is a template generator, not a full video generation workflow. The user-facing output should be natural-language Chinese, not a JSON blob. JSON-like structures may exist internally for storage, validation, and future API compatibility, but the visible deliverable is a Chinese preset write-up and final Seedance prompt.
+已经确认的第一版范围是 **模板生成器**，不是完整的视频生成闭环。用户可见输出必须是 **自然语言中文**，不是 JSON 结构。内部可以用结构化字段做存储、校验和后续 API 兼容，但页面上给运营人员看的交付物应该是中文模板说明和最终 Seedance 提示词。
 
-## Goals
+## 目标
 
-Build a Seedance 2.0 video preset builder that:
+第一版要实现一个 Seedance 2.0 视频模板生成器，具体目标是：
 
-- Accepts a reference video URL.
-- Produces a structured Chinese analysis of the video effect.
-- Produces a reusable Chinese Seedance 2.0 prompt template based on the Seedance guide.
-- Produces a final Chinese prompt after the operator chooses or uploads a target image slot.
-- Presents the result in a format suitable for copying into another project's backend configuration.
-- Prepares the codebase for KIE `bytedance/seedance-2` integration without making live video generation required in the first release.
+- 接收一个参考视频 URL。
+- 输出该视频特效的中文结构化分析。
+- 基于 Seedance 2.0 提示词指南，输出一段可复用的中文提示词模板。
+- 在运营人员填写或选择目标素材位后，输出最终可复制的中文 Seedance 提示词。
+- 输出格式适合直接复制到其他项目后台做模板配置。
+- 为后续接入 KIE `bytedance/seedance-2` 留好模型、模式、时长、画幅、音频等配置边界，但第一版不要求真实调用视频生成接口。
 
-## Non-Goals
+## 不做的事情
 
-The first release will not:
+第一版不做以下内容：
 
-- Require real video generation to complete the preset-building flow.
-- Require a database; local JSON/file storage is enough.
-- Implement payment, premium gating, or user accounts.
-- Automatically download videos from platforms that block direct file access.
-- Show JSON as the primary output format.
-- Guarantee that every public social/video URL can be inspected unless the URL exposes a direct or embeddable video resource.
+- 不要求真实生成视频才能完成模板生成流程。
+- 不引入数据库，本地 JSON / 文件存储即可。
+- 不做支付、Premium 权限、账号系统。
+- 不自动下载无法直接访问的视频平台资源。
+- 不把 JSON 作为页面主要输出格式。
+- 不保证每一个公开视频链接都能被系统检查；只有直接可访问或可嵌入的视频 URL 才能预览。
 
-## Product Flow
+## 产品流程
 
-1. The operator opens the video preset builder.
-2. The operator enters a reference video URL and optional template name/category/tags.
-3. The system records the reference URL and asks the model to produce a Chinese reverse prompt analysis.
-4. The output page shows:
-   - Reference video preview when embeddable.
-   - Chinese effect summary.
-   - Chinese shot-by-shot timeline.
-   - Chinese Seedance prompt template.
-   - Chinese backend configuration notes.
-   - Copy buttons for each natural-language block.
-5. The operator may provide a target image slot description such as `@图片1 为用户上传的目标主体图`.
-6. The system renders a final Chinese prompt that can be copied into another project's preset backend.
+1. 运营人员进入视频模板生成器页面。
+2. 运营人员输入参考视频 URL，并可选填写模板名称、分类、标签。
+3. 系统记录参考视频 URL，并让模型生成中文逆向提示词分析。
+4. 结果页展示以下内容：
+   - 可嵌入时展示参考视频预览。
+   - 中文效果概述。
+   - 中文分镜时间轴。
+   - 中文 Seedance 提示词模板。
+   - 中文后台配置备注。
+   - 每个自然语言块都提供复制按钮。
+5. 运营人员可以填写目标素材位说明，例如：`@图片1 为用户上传的目标主体图`。
+6. 系统渲染最终中文提示词，运营人员可以复制到其他项目后台。
 
-## User-Facing Output Format
+## 用户可见输出格式
 
-The visible output should be divided into Chinese sections, not JSON.
+页面输出应该拆成中文段落，而不是 JSON。
 
-Example shape:
+示例格式：
 
 ```text
 模板名称：未来感眼镜穿梭模板
@@ -70,70 +70,86 @@ Seedance 2.0 提示词：
 推荐模式：多模态参考视频生成。生成时长：10秒。画幅：9:16。开启音频：按模板需要选择。
 ```
 
-The output may include internal metadata in hidden state or local files, but the operator-facing result remains copyable Chinese prose.
+页面内部可以保存结构化元数据，但运营人员看到和复制的内容必须是中文自然语言。
 
-## Seedance Prompt Rules
+## Seedance 提示词规则
 
-The prompt renderer must follow the Seedance 2.0 writing guide:
+提示词渲染器必须遵守 Seedance 2.0 提示词指南：
 
-- Every referenced asset must have an explicit purpose, such as `@图片1 作为目标主体图` or `@视频1 作为运镜、动作、特效和节奏参考`.
-- The prompt should cover subject, scene, action, camera movement, timeline, transition/effect, audio, and style.
-- Presets longer than 8-10 seconds should include a timeline.
-- Viral effect templates should emphasize reference video camera motion, rhythm, transitions, and effect replication.
-- If a target image is provided, the final prompt must clearly say whether it is a subject image, first frame, style reference, product appearance reference, or background reference.
-- Avoid relying on unsupported real-person face guarantees. If the template expects realistic human face consistency, warn the operator that Seedance may reject or degrade that use case.
+- 每个引用素材都必须说明用途，例如：`@图片1 作为目标主体图`、`@视频1 作为运镜、动作、特效和节奏参考`。
+- 提示词需要覆盖主体、场景、动作、运镜、分时段描述、转场/特效、音频/音效、风格氛围。
+- 8-10 秒以上的模板建议使用分镜时间轴。
+- 爆款特效模板要重点描述参考视频的运镜、节奏、转场和特效复刻方式。
+- 如果用户提供目标图片，最终提示词必须清楚说明该图片是主体图、首帧图、风格参考、产品外观参考，还是背景参考。
+- 不依赖 Seedance 对写实真人脸部素材的一致性保证。如果模板预期使用写实真人脸，需要提示运营人员该场景可能被拦截或效果不稳定。
 
-## KIE Seedance 2.0 Integration Decision
+## KIE Seedance 2.0 接入判断
 
-Yes, the project should account for KIE Seedance 2.0. The existing KIE code only supports image-oriented task creation through image model definitions. KIE's current Seedance 2.0 docs list the model as `bytedance/seedance-2` on `/api/v1/jobs/createTask`, with inputs including `prompt`, `first_frame_url`, `last_frame_url`, `reference_image_urls`, `reference_video_urls`, `reference_audio_urls`, `generate_audio`, `resolution`, `aspect_ratio`, `duration`, and `web_search`.
+这个项目需要考虑 KIE Seedance 2.0，但第一版不应该把真实视频生成作为阻塞条件。
 
-However, live KIE video generation is not required for first-release preset building. The design should split this into two layers:
+当前项目里的 KIE 封装主要面向图片生成：通过图片模型定义构造输入，创建任务后轮询图片结果。KIE 当前 Seedance 2.0 文档中，视频模型是 `bytedance/seedance-2`，接口仍然是 `/api/v1/jobs/createTask`，输入字段包括：
 
-1. Preset builder layer:
-   - Generates Chinese preset copy and final Seedance prompt.
-   - Stores KIE-compatible generation recommendations such as duration, aspect ratio, audio toggle, and generation mode.
-   - Does not call KIE.
+- `prompt`
+- `first_frame_url`
+- `last_frame_url`
+- `reference_image_urls`
+- `reference_video_urls`
+- `reference_audio_urls`
+- `generate_audio`
+- `resolution`
+- `aspect_ratio`
+- `duration`
+- `web_search`
 
-2. Optional generation layer:
-   - Adds `bytedance/seedance-2` as a video model/provider.
-   - Uploads or accepts public URLs for target images and reference videos.
-   - Creates KIE video tasks and polls results.
-   - Can be enabled later as a "test generate" or full user-facing generation flow.
+因此设计上拆成两层：
 
-This keeps the first version useful for backend configuration while preventing the prompt reverse-engineering tool from being blocked by video upload, task polling, cost, or result storage complexity.
+1. 模板生成层：
+   - 生成中文模板说明和最终 Seedance 提示词。
+   - 记录与 KIE 兼容的生成建议，例如推荐模式、时长、画幅、是否开启音频。
+   - 不调用 KIE。
 
-## KIE Mode Constraints
+2. 可选生成层：
+   - 后续新增 `bytedance/seedance-2` 视频模型/provider。
+   - 接收或上传目标图片、参考视频、参考音频等资源 URL。
+   - 创建 KIE 视频生成任务并轮询结果。
+   - 后续可以作为“测试生成”或完整用户视频生成闭环开启。
 
-KIE's Seedance 2.0 documentation says the following scenarios are mutually exclusive:
+这样第一版可以先服务后台配置，不被视频上传、任务轮询、费用、失败处理和结果存储拖慢。
 
-- Image-to-video with first frame.
-- Image-to-video with first and last frame.
-- Multimodal reference-to-video with reference images, videos, or audio.
+## KIE 模式约束
 
-The preset builder must therefore store a recommended generation mode in operator-facing terms:
+KIE Seedance 2.0 文档说明，以下三种场景互斥，不能同时使用：
 
-- `首帧图生视频`：use when the uploaded image must be the exact first frame.
-- `首尾帧图生视频`：use when exact beginning and ending images matter.
-- `多模态参考视频生成`：use when the reference video's motion, effects, audio, or rhythm matters more than exact first/last frame identity.
-- `纯文本视频生成`：use only for templates that do not require uploaded user assets.
+- 图生视频：只使用首帧。
+- 图生视频：同时使用首帧和尾帧。
+- 多模态参考视频生成：使用参考图片、参考视频、参考音频。
 
-For the Higgsfield-style use case where the user uploads one target image and applies a viral reference effect, the recommended default is `多模态参考视频生成`, with `@图片1` as the target subject and `@视频1` as the effect/camera/rhythm reference. If a template must force the uploaded image to be the first frame, the recommendation should switch to `首帧图生视频` and avoid reference video inputs in the same KIE request.
+因此模板生成器必须用运营人员能理解的中文记录推荐模式：
 
-## Information Architecture
+- `首帧图生视频`：适合用户上传图片必须严格作为视频第一帧的模板。
+- `首尾帧图生视频`：适合开头和结尾都必须严格匹配指定图片的模板。
+- `多模态参考视频生成`：适合重点复刻参考视频的运镜、动作、节奏、转场、特效或音频。
+- `纯文本视频生成`：只适合不需要用户上传素材的模板。
 
-The first release should add:
+对于类似 Higgsfield viral presets 的场景，用户上传 1 张目标图，然后套用参考视频特效，默认推荐模式是 `多模态参考视频生成`：`@图片1` 作为目标主体图，`@视频1` 作为运镜、特效和节奏参考。
 
-- `/video-presets`: a grid of existing video preset templates.
-- `/video-presets/new`: a builder form for entering a reference video URL and generating Chinese preset copy.
-- `/video-presets/[id]`: detail page with reference preview, Chinese analysis, template prompt, target image slot instructions, and final prompt.
+如果某个模板必须让用户上传图严格成为第一帧，则推荐模式应该改为 `首帧图生视频`，并且不要在同一次 KIE 请求里同时传参考视频。
 
-These pages can reuse the current app's plain operational UI style. The preset grid should feel closer to a working template library than a marketing landing page: compact cards, visible preview area, title, category, tags, and quick actions.
+## 信息架构
 
-## Data Storage
+第一版建议新增三个页面：
 
-Use local file storage for the first release, following the project's existing `runs/` and `output/` pattern.
+- `/video-presets`：视频模板库，以卡片网格展示已有模板。
+- `/video-presets/new`：新建模板页面，输入参考视频 URL 并生成中文模板内容。
+- `/video-presets/[id]`：模板详情页，展示参考视频预览、中文分析、模板提示词、目标素材说明和最终提示词。
 
-Suggested stored fields:
+页面可以复用当前项目偏运营工具的简洁风格。模板库应更像一个可工作的后台模板库，而不是营销落地页：卡片紧凑，预览视频清晰，展示模板名称、分类、标签和快捷操作。
+
+## 数据存储
+
+第一版使用本地文件存储，沿用当前项目 `runs/` 和 `output/` 的思路。
+
+建议内部保存以下字段：
 
 - `id`
 - `title`
@@ -153,30 +169,30 @@ Suggested stored fields:
 - `createdAt`
 - `updatedAt`
 
-These fields are implementation details. The UI should render them as Chinese natural-language sections.
+这些字段只是实现细节。UI 必须把它们渲染成中文自然语言段落，而不是直接展示 JSON。
 
-## Error Handling
+## 错误处理
 
-The builder should handle:
+模板生成器需要处理以下情况：
 
-- Empty or invalid video URL.
-- Video URL that cannot be embedded or previewed.
-- Missing template title, by deriving a conservative title from the generated effect summary.
-- Generated analysis missing required Seedance sections, by showing validation warnings and asking the operator to regenerate or edit.
-- Prompt missing explicit `@图片1` or `@视频1` usage, by blocking copy of the final prompt until the issue is fixed.
+- 视频 URL 为空或格式非法。
+- 视频 URL 无法嵌入或预览。
+- 模板名称为空时，从生成的效果概述里保守推导一个名称。
+- 生成结果缺少 Seedance 必要段落时，展示校验提醒，并允许运营人员重新生成或编辑。
+- 提示词缺少明确的 `@图片1` 或 `@视频1` 用途说明时，阻止复制最终提示词，直到问题修复。
 
-## Testing
+## 测试要求
 
-Focused tests should cover:
+测试应覆盖：
 
-- Preset validation requires a source video URL, prompt template, and explicit asset references.
-- Prompt rendering replaces or inserts the target image slot in Chinese without producing JSON output.
-- Mode validation rejects incompatible KIE recommendations, such as first-frame and multimodal references in the same generated request.
-- Storage can save, read, update, and list presets.
-- UI smoke tests or component tests verify the builder and detail page show Chinese sections and copyable prompt text.
+- 模板校验要求存在参考视频 URL、提示词模板和明确的素材引用。
+- 提示词渲染能用中文插入或替换目标图片素材位，并且不会输出 JSON 作为主结果。
+- 模式校验能拒绝互斥 KIE 模式，例如同一次生成同时使用首帧图生视频和多模态参考视频。
+- 存储模块可以保存、读取、更新、列出模板。
+- UI 冒烟测试或组件测试确认生成器和详情页展示中文段落，并提供可复制提示词。
 
-## Open Implementation Notes
+## 实现备注
 
-Prompt reverse-engineering needs an analysis model. The first implementation can use a text-only prompt over operator-supplied video descriptions or URLs if direct video inspection is unavailable. A later version can add actual video frame sampling or multimodal video analysis if the runtime supports it.
+提示词逆向需要一个分析模型。第一版如果运行环境不能直接分析视频内容，可以先使用文本输入方式：运营人员提供视频 URL 和必要描述，系统根据这些信息生成中文模板。后续如果运行环境支持多模态视频分析，再增加视频抽帧或直接视频理解能力。
 
-If KIE generation is added in the same implementation cycle, it should be a separate provider extension and route, not mixed into the preset analysis module. Video generation returns video URLs rather than image URLs, so the current image-only provider and post-processing flow must be generalized instead of reused blindly.
+如果同一个实现周期里要接入 KIE 生成视频，也应该作为独立 provider 和独立 API 路由实现，不要混在模板分析模块里。视频生成返回的是视频 URL，而当前 provider 和后处理流程主要面向图片 URL，所以不能直接复用图片生成链路，需要抽象成支持图片结果和视频结果的通用任务结构。
