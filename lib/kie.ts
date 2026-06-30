@@ -73,9 +73,17 @@ export async function createTask(params: {
   return json.data.taskId;
 }
 
-export async function pollTaskResult(taskId: string): Promise<string> {
-  const MAX_ATTEMPTS = 100; // 最长 5 分钟（100 次 × 3 秒）
-  const POLL_INTERVAL_MS = 3000;
+export interface PollTaskOpts {
+  maxAttempts?: number; // 最大轮询次数，默认 100
+  intervalMs?: number;  // 每次间隔毫秒，默认 3000
+}
+
+export async function pollTaskResult(
+  taskId: string,
+  opts?: PollTaskOpts
+): Promise<string> {
+  const MAX_ATTEMPTS = opts?.maxAttempts ?? 100; // 默认最长 5 分钟（100 次 × 3 秒）
+  const POLL_INTERVAL_MS = opts?.intervalMs ?? 3000;
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
@@ -110,5 +118,38 @@ export async function pollTaskResult(taskId: string): Promise<string> {
     }
   }
 
-  throw new Error("KIE.AI 生成超时（超过 5 分钟），请重试");
+  const timeoutMin = Math.round((MAX_ATTEMPTS * POLL_INTERVAL_MS) / 60000);
+  throw new Error(`KIE.AI 生成超时（超过 ${timeoutMin} 分钟），请重试`);
+}
+
+/**
+ * 为视频任务创建 KIE 任务（不依赖图片模型注册表），直接传 model + input。
+ * 复用现有的 getHeaders() 和相同的 429 / 错误处理逻辑。
+ */
+export async function createVideoTask(params: {
+  model: string;
+  input: Record<string, unknown>;
+}): Promise<string> {
+  const res = await fetch(`${KIE_API_BASE}/api/v1/jobs/createTask`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({
+      model: params.model,
+      input: params.input,
+    }),
+  });
+
+  if (res.status === 429) {
+    throw new Error("KIE.AI 接口限流（429），请稍候再试");
+  }
+  if (!res.ok) {
+    throw new Error(`KIE.AI createTask 失败：HTTP ${res.status}`);
+  }
+
+  const json = (await res.json()) as KieCreateTaskResponse;
+  if (json.code !== 200) {
+    throw new Error(`KIE.AI createTask 错误：${json.msg}`);
+  }
+
+  return json.data.taskId;
 }

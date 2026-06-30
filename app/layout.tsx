@@ -30,6 +30,9 @@ export default function RootLayout({
               <a href="/showcase" className="text-gray-600 hover:text-gray-900">
                 Showcase 裁图
               </a>
+              <a href="/video" className="text-gray-600 hover:text-gray-900">
+                AI Video
+              </a>
             </nav>
           </div>
         </header>

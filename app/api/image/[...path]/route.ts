@@ -40,7 +40,11 @@ export async function GET(
           ? "image/png"
           : ext === ".jpg" || ext === ".jpeg"
             ? "image/jpeg"
-            : "application/octet-stream";
+            : ext === ".webm"
+              ? "video/webm"   // WebM 视频（VP9 + Opus）
+              : ext === ".mp4"
+                ? "video/mp4"  // MP4 视频（原始下载文件）
+                : "application/octet-stream";
 
     return new NextResponse(buffer, {
       headers: {
