@@ -41,6 +41,7 @@ export default function VideoResultClient({ initialRecord }: VideoResultClientPr
   const [finalizeError, setFinalizeError] = useState("");
   const [finalized, setFinalized] = useState(false);  // 转码完成标志
   const [downloadUrl, setDownloadUrl] = useState("");  // 下载链接
+  const [pollError, setPollError] = useState("");
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -52,15 +53,25 @@ export default function VideoResultClient({ initialRecord }: VideoResultClientPr
     intervalRef.current = setInterval(async () => {
       try {
         const res = await fetch(`/api/video/runs/${runId}`, { cache: "no-store" });
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (res.status === 404) {
+            setPollError("找不到任务状态，请刷新页面或重新提交");
+            clearInterval(intervalRef.current!);
+            intervalRef.current = null;
+          } else {
+            setPollError(`状态查询失败（${res.status}），正在自动重试...`);
+          }
+          return;
+        }
         const fresh = (await res.json()) as VideoRunRecord;
+        setPollError("");
         setRecord(fresh);
         if (isTerminal(fresh.status)) {
           clearInterval(intervalRef.current!);
           intervalRef.current = null;
         }
       } catch {
-        // 网络错误时静默继续
+        setPollError("网络连接异常，正在自动重试...");
       }
     }, 2000);
   }, []);
@@ -223,6 +234,11 @@ export default function VideoResultClient({ initialRecord }: VideoResultClientPr
               ? "正在从链接下载视频，转码为 WebM，可能需要数分钟"
               : "可能需要数分钟，请耐心等待"}
           </p>
+          {pollError && (
+            <p role="alert" className="text-red-600 text-sm">
+              {pollError}
+            </p>
+          )}
         </div>
       )}
 

@@ -4,9 +4,9 @@
 .env*.local
 
 # 生成的图片和运行记录（本地存储）
-output/
-inputs/
-runs/
+/output/
+/inputs/
+/runs/
 
 # Next.js 构建产物
 .next/
